@@ -1,33 +1,17 @@
-const mod = (a, b) => {
-  return new Promise((resolve, reject) => {
-    if (b == 0) {
-      // Rejected (error)
-      reject("Modulo zero is not allowed");
-    } else {
-      // Resolved (Success)
-      resolve(a % b);
-    }
-  });
-};
+const io = require("socket.io-client");
 
-// 5 mod 2 will give result 1
-async function _5mod2() {
-  try {
-    const res = await mod(5, 2);
-    console.log(`The result of division is ${res}`);
-  } catch (err) {
-    console.log(err);
-  }
-}
-_5mod2();
+const socket = io("http://localhost:4500");
 
-// 5 mod 0 will give error
-async function _5mod0() {
-  try {
-    const res = await mod(5, 0);
-    console.log(`The result of division is ${res}`);
-  } catch (err) {
-    console.log(err);
-  }
-}
-_5mod0();
+socket.on("connect", (user) => {
+  // console.log("Connected to server!");
+  // socket.emit("message", "Hello from client!");
+  socket.emit("message", "zaali");
+});
+
+socket.on("message", (msg) => {
+  console.log(`Received message: ${msg}`);
+});
+
+socket.on("disconnect", () => {
+  console.log("Disconnected from server!");
+});
