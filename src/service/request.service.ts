@@ -1,17 +1,17 @@
 import { User } from "../entities/user.entity";
-import { userInterface } from "../interfaces/user.interface";
 import { myDataSource } from "../database/db.config";
-
+import { io } from "..";
 import { friendRequests } from "../entities/sendFriendRequest.entity";
 import { datetime } from "../helper/helper";
+import { redisService } from "./redis.service";
 import { FriendRequestResponse } from "../enums/friendRequestRespons.enum";
 import { Friends } from "../entities/friends.entity";
-import e from "express";
 
 export class RequestService {
   public userRepo = myDataSource.getRepository(User);
   public requestRepo = myDataSource.getRepository(friendRequests);
   public friendsRepo = myDataSource.getRepository(Friends);
+  private redis = redisService;
   async requestExsists(
     sender: User,
     friend: User,
@@ -54,7 +54,8 @@ export class RequestService {
             createdAt: datetime(),
           });
 
-          console.log("aqvar");
+          console.log(io);
+
           break;
         case FriendRequestResponse.REJECTED:
           requestExsists.status = FriendRequestResponse.REJECTED;
@@ -87,6 +88,14 @@ export class RequestService {
         status: "pending",
         createdAt: datetime(),
       });
+      const friendSocketId = await this.redis.getClientId(friend.email);
+
+      if (friendSocketId)
+        io.to(friendSocketId).emit("notificaton", {
+          sender: sender.email,
+          friend: friend.email,
+          status: "pending",
+        });
 
       return sendRequest;
     } catch (err) {

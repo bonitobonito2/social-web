@@ -14,8 +14,7 @@ export const sendFriendRequest: RequestHandler = async (req, res, next) => {
     const friend = await authService.getUser(friendEmail);
     if (!user || !friend) throw "user doesnot exsists";
     await requestService.sendRequest(user, friend);
-    const io = req.app.get("io");
-    io.emit("sendRequest", "friend request");
+
     return res.json("request sent");
   } catch (err) {
     console.log(err);

@@ -10,16 +10,20 @@ import { Server, Socket } from "socket.io";
 import requestRouter from "./routes/friendRequest.routes";
 const port = process.env.PORT ? process.env.PORT : 4500;
 import { startSocket } from "./socket/socket";
-
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
 const app: Application = express();
 
+export let io: Server<
+  DefaultEventsMap,
+  DefaultEventsMap,
+  DefaultEventsMap,
+  any
+>;
 myDataSource
   .initialize()
   .then(() => {
     const server = http.createServer(app);
-
-    const io = startSocket(server);
-    app.set("io", io);
+    io = startSocket(server);
     instrument(io, {
       auth: false,
     });
@@ -30,6 +34,7 @@ myDataSource
   .catch((err) => {
     throw err;
   });
+
 dotenv.config();
 
 app.use(bodyParser.json());
