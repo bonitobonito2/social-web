@@ -1,21 +1,24 @@
-import redisClient from "../redis/redis";
-export class redisClass {
-  private readonly client = redisClient();
-  constructor() {}
+import { redisInstance } from "./../redis/redis";
 
-  async setSocketClient(email: string, socketId: string): Promise<string> {
+export class redisClass extends redisInstance {
+  private readonly client = this.start();
+
+  constructor() {
+    super();
+  }
+
+  async setSocketClient(id: string, socketId: string): Promise<string> {
     try {
-      //   await this.client.flushAll();
-      const data = await this.client.set(email, socketId);
+      const data = await this.client.set(id, socketId);
       return data;
     } catch (err) {
       throw err;
     }
   }
 
-  async getClientId(email: string): Promise<string> {
+  async getClientId(id: string): Promise<string> {
     try {
-      const clientId = await this.client.get(email);
+      const clientId = await this.client.get(id);
       return clientId;
     } catch (err) {
       throw err;
@@ -35,8 +38,7 @@ export class redisClass {
         keys.map(async (key) => await this.client.get(key))
       );
       const correctIndex = values.findIndex((value) => value === socketId);
-      console.log(values);
-      console.log(keys);
+
       await this.client.del(keys[correctIndex]);
 
       return "deleted";

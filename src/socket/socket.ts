@@ -15,29 +15,17 @@ export const startSocket = (
     },
   });
   io.on("connection", async (socket: Socket) => {
-    const email = socket.handshake.query.email;
-    console.log(await redis.getAllUsers());
-    if (email == undefined) socket.emit("error", "no param email");
-    console.log(email);
-    await redis.setSocketClient(
-      typeof email == "string" ? email : email[0],
-      socket.id
-    );
+    new SocketService(io, socket).handleConnection();
 
     socket.on("join", () => {
-      socket.join("room");
-      const hey = io.sockets.adapter.rooms.get("room");
-      console.log(hey);
-      socket.emit("join", "joined");
+      new SocketService(io, socket).joinToRoom();
     });
-    // listen for a message from the client
     socket.on("message", (message) =>
-      new SocketService(io, socket, message).sendMessage()
+      new SocketService(io, socket).sendMessage(message)
     );
 
     socket.on("disconnect", async () => {
-      await redisService.removeClientId(socket.id);
-      console.log("user disconnected");
+      new SocketService(io, socket).disconnect();
     });
   });
 

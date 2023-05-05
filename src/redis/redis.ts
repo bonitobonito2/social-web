@@ -1,17 +1,18 @@
 import { createClient } from "redis";
 
-export default function redisClient() {
-  const redisClient = createClient();
+export class redisInstance {
+  redisClient = createClient();
 
-  redisClient.connect();
+  start() {
+    this.redisClient.connect();
 
-  redisClient.on("connect", () => {
-    console.log("Redis client connected");
-  });
+    this.redisClient.on("connect", () => {
+      console.log("Redis client connected");
+    });
 
-  redisClient.on("error", (err) => {
-    console.error("Redis error:", err);
-  });
-
-  return redisClient;
+    this.redisClient.on("error", (err) => {
+      console.error("Redis error:", err);
+    });
+    return this.redisClient;
+  }
 }
