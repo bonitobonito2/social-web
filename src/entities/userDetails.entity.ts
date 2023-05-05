@@ -1,13 +1,5 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  JoinColumn,
-  OneToOne,
-} from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Gender } from "../enums/gender.enum";
-import { User } from "./user.entity";
 @Entity("userDetails")
 export class UserDetails {
   @PrimaryGeneratedColumn()

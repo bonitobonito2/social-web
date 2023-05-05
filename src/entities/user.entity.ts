@@ -4,9 +4,11 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
+  ManyToMany,
 } from "typeorm";
 import { EncryptionTransformer } from "typeorm-encrypted";
 import { UserDetails } from "./userDetails.entity";
+import { chat } from "./chat.entity";
 
 @Entity("user")
 export class User {
@@ -36,4 +38,7 @@ export class User {
   @OneToOne(() => UserDetails)
   @JoinColumn()
   userDetails: UserDetails;
+
+  @ManyToMany(() => chat, (chat) => chat.user)
+  chat: chat[];
 }

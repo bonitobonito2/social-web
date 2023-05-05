@@ -1,17 +1,15 @@
 const io = require("socket.io-client");
+const socket = io.connect("http://localhost:4500");
 
-const socket = io("http://localhost:4500");
-
-socket.on("connect", (user) => {
-  // console.log("Connected to server!");
-  // socket.emit("message", "Hello from client!");
-  socket.emit("message", "zaali");
+// listen for the 'connect' event
+socket.on("connect", () => {
+  console.log("Connected to the server!");
 });
 
-socket.on("message", (msg) => {
-  console.log(`Received message: ${msg}`);
+// listen for the 'message' event
+socket.on("message", (data) => {
+  console.log(`Received message: ${data.sent}`);
 });
 
-socket.on("disconnect", () => {
-  console.log("Disconnected from server!");
-});
+// send a message to the server
+socket.emit("message", "Hello from the client!");

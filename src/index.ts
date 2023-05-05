@@ -2,12 +2,12 @@ import express, { Application, NextFunction, Request, Response } from "express";
 import { myDataSource } from "./database/db.config";
 import dotenv from "dotenv";
 import http from "http";
-
-import authRouter from "./routes/auth.route";
+import { instrument } from "@socket.io/admin-ui";
+import authRouter from "./routes/auth.routes";
 import bodyParser from "body-parser";
 import { validateToken } from "./middlewares/validateToken.middleware";
 import { Server, Socket } from "socket.io";
-import requestRouter from "./routes/friendRequest.route";
+import requestRouter from "./routes/friendRequest.routes";
 const port = process.env.PORT ? process.env.PORT : 4500;
 import { startSocket } from "./socket/socket";
 
@@ -19,7 +19,10 @@ myDataSource
     const server = http.createServer(app);
 
     const io = startSocket(server);
-
+    app.set("io", io);
+    instrument(io, {
+      auth: false,
+    });
     server.listen(port, () => {
       console.log(`Server started at http://localhost:${port}`);
     });
