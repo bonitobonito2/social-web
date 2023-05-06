@@ -6,6 +6,7 @@ import { datetime } from "../helper/helper";
 import { redisService } from "./redis.service";
 import { FriendRequestResponse } from "../enums/friendRequestRespons.enum";
 import { Friends } from "../entities/friends.entity";
+import { SocketEmit } from "../enums/socket.enum";
 
 export class RequestService {
   public userRepo = myDataSource.getRepository(User);
@@ -54,8 +55,6 @@ export class RequestService {
             createdAt: datetime(),
           });
 
-          console.log(io);
-
           break;
         case FriendRequestResponse.REJECTED:
           requestExsists.status = FriendRequestResponse.REJECTED;
@@ -91,7 +90,7 @@ export class RequestService {
       const friendSocketId = await this.redis.getClientId(friend.email);
 
       if (friendSocketId)
-        io.to(friendSocketId).emit("notificaton", {
+        io.to(friendSocketId).emit(SocketEmit.NOTIFICATION, {
           sender: sender.email,
           friend: friend.email,
           status: "pending",

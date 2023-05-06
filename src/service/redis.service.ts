@@ -33,13 +33,12 @@ export class redisClass extends redisInstance {
   async removeClientId(socketId: string) {
     try {
       const keys = await this.client.keys("*");
-      console.log(keys);
       const values = await Promise.all(
         keys.map(async (key) => await this.client.get(key))
       );
       const correctIndex = values.findIndex((value) => value === socketId);
-
-      await this.client.del(keys[correctIndex]);
+      console.log(keys, values);
+      if (correctIndex !== -1) await this.client.del(keys[correctIndex]);
 
       return "deleted";
     } catch (err) {

@@ -15,3 +15,14 @@ export const validateToken: RequestHandler = (req, res, next) => {
     return res.status(404).send(Err);
   }
 };
+
+export const validateTokenFunction = (token: string) => {
+  if (!token) {
+    throw new Error("u need token on protected routes");
+  }
+  try {
+    return jwt.verify(token, "topSecret21");
+  } catch (Err) {
+    throw "token is not verifed";
+  }
+};

@@ -54,7 +54,7 @@ export const login: RequestHandler = async (request, response, next) => {
     );
   }
   if (userExsists.password == password) {
-    const token = getTokenForAuthentificaion(email);
+    const token = getTokenForAuthentificaion(email, userExsists.id.toString());
     return response.json({ succses: true, token: token });
   } else {
     return response.status(404).json("incorrect password");

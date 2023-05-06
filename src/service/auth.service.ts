@@ -14,6 +14,14 @@ export class AuthService {
     }
   }
 
+  public async getUserById(id: number): Promise<User> {
+    try {
+      return await this.userRepo.findOneByOrFail({ id: id });
+    } catch (err) {
+      throw "user doesnot exsists";
+    }
+  }
+
   public async createUser(userInfo: userInterface): Promise<boolean> {
     try {
       const data = await this.userRepo.insert({
