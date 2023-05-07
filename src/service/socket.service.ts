@@ -2,11 +2,7 @@ import { Server, Socket } from "socket.io";
 import { redisService } from "./redis.service";
 import { SocketEmit } from "../enums/socket.enum";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { AuthService } from "./auth.service";
-import {
-  validateToken,
-  validateTokenFunction,
-} from "../middlewares/validateToken.middleware";
+import { validateTokenFunction } from "../middlewares/validateToken.middleware";
 import { JwtPayload } from "jsonwebtoken";
 
 export class SocketService {
