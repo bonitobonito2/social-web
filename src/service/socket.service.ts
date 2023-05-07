@@ -7,20 +7,22 @@ import {
   validateToken,
   validateTokenFunction,
 } from "../middlewares/validateToken.middleware";
-import { decode } from "punycode";
 import { JwtPayload } from "jsonwebtoken";
 
 export class SocketService {
-  private io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;
-  private socket: Socket;
+  private static instance: SocketService;
   private redisService = redisService;
-  private message: string;
-  constructor(
-    io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
-    socket: Socket
+
+  private constructor(
+    private io: Server<
+      DefaultEventsMap,
+      DefaultEventsMap,
+      DefaultEventsMap,
+      any
+    >,
+    private socket: Socket
   ) {
-    this.io = io;
-    this.socket = socket;
+    // Initialize the SocketService
   }
 
   public sendMessage(message: string) {
@@ -74,4 +76,19 @@ export class SocketService {
       this.socket.disconnect();
     }
   }
+
+  public static getInstance(
+    io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+    socket: Socket
+  ): SocketService {
+    console.log("getting instance");
+    console.log(socket.id);
+
+    if (!SocketService.instance) {
+      SocketService.instance = new SocketService(io, socket);
+    }
+    return SocketService.instance;
+  }
+
+  // Rest of the SocketService methods
 }
