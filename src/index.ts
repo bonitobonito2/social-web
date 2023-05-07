@@ -23,7 +23,7 @@ myDataSource
   .initialize()
   .then(() => {
     const server = http.createServer(app);
-    io = startSocket(server);
+    const io = startSocket(server);
     instrument(io, {
       auth: false,
     });
