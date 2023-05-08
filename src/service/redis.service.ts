@@ -30,6 +30,20 @@ export class redisClass extends redisInstance {
     console.log(keys);
   }
 
+  async getClientBySocketId(socketId: string) {
+    try {
+      const keys = await this.client.keys("*");
+      const values = await Promise.all(
+        keys.map(async (key) => await this.client.get(key))
+      );
+      const correctIndex = values.findIndex((value) => value === socketId);
+      console.log(keys, values);
+
+      if (correctIndex !== -1) return this.client.del(keys[correctIndex]);
+    } catch (err) {
+      throw err;
+    }
+  }
   async removeClientId(socketId: string) {
     try {
       const keys = await this.client.keys("*");

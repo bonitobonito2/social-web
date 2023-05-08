@@ -4,14 +4,16 @@ import dotenv from "dotenv";
 import http from "http";
 import { instrument } from "@socket.io/admin-ui";
 import authRouter from "./routes/auth.routes";
+import cors from "cors";
 import bodyParser from "body-parser";
 import { validateToken } from "./middlewares/validateToken.middleware";
 import { Server, Socket } from "socket.io";
 import requestRouter from "./routes/friendRequest.routes";
 const port = process.env.PORT ? process.env.PORT : 4500;
-import { startSocket } from "./socket/socket";
+import { getSocketInstance } from "./socket/socket";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 const app: Application = express();
+app.use(cors());
 
 export let io: Server<
   DefaultEventsMap,
@@ -23,10 +25,8 @@ myDataSource
   .initialize()
   .then(() => {
     const server = http.createServer(app);
-    const io = startSocket(server);
-    instrument(io, {
-      auth: false,
-    });
+    getSocketInstance(server);
+
     server.listen(port, () => {
       console.log(`Server started at http://localhost:${port}`);
     });

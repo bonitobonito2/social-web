@@ -1,6 +1,7 @@
 import { User } from "../entities/user.entity";
 import { myDataSource } from "../database/db.config";
 import { io } from "..";
+import { SocketService } from "./socket.service";
 import { friendRequests } from "../entities/sendFriendRequest.entity";
 import { datetime } from "../helper/helper";
 import { redisService } from "./redis.service";

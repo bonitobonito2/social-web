@@ -4,9 +4,11 @@ import { SocketEmit } from "../enums/socket.enum";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { validateTokenFunction } from "../middlewares/validateToken.middleware";
 import { JwtPayload } from "jsonwebtoken";
+import { AuthService } from "./auth.service";
 
 export class SocketService {
   private static instance: SocketService;
+  private authService: AuthService = new AuthService();
   private redisService = redisService;
 
   private constructor(
@@ -21,15 +23,13 @@ export class SocketService {
     // Initialize the SocketService
   }
 
-  public sendMessage(message: string) {
+  public async sendMessage(message: string) {
     const roomUsers = this.io.sockets.adapter.rooms.get("room");
     const data = JSON.parse(message);
 
-    if (roomUsers?.has(this.socket.id)) {
-      this.io.to("room").emit(SocketEmit.MESSAGE, { sent: data["key"] });
-    } else {
-      this.socket.emit(SocketEmit.ERROR, "not room user");
-    }
+    if (roomUsers?.has(this.socket.id))
+      this.socket.to("room").emit(SocketEmit.MESSAGE, { sent: data["key"] });
+    else this.socket.emit(SocketEmit.ERROR, "not room user");
   }
 
   public joinToRoom() {
@@ -45,7 +45,10 @@ export class SocketService {
   private validateToken() {
     try {
       const token = this.socket.handshake.headers.token;
-      return validateTokenFunction(typeof token == "string" ? token : token[0]);
+      const validated = validateTokenFunction(
+        typeof token == "string" ? token : token[0]
+      );
+      return validated;
     } catch (err) {
       throw err;
     }
@@ -64,9 +67,11 @@ export class SocketService {
   public async handleConnection() {
     try {
       const decoded: string | JwtPayload = this.validateToken();
-
       await this.saveSocketClientInRedis(decoded["id"], this.socket.id);
+
+      this.socket.emit("connection", true);
     } catch (err) {
+      console.log(err);
       this.socket.emit(SocketEmit.ERROR, err);
 
       this.socket.disconnect();
@@ -77,13 +82,7 @@ export class SocketService {
     io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
     socket: Socket
   ): SocketService {
-    console.log("getting instance");
-    console.log(socket.id);
-
-    if (!SocketService.instance) {
-      SocketService.instance = new SocketService(io, socket);
-    }
-    return SocketService.instance;
+    return (SocketService.instance = new SocketService(io, socket));
   }
 
   // Rest of the SocketService methods
