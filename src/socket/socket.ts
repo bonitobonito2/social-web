@@ -25,6 +25,7 @@ class SocketServer {
     this.io.on(SocketOn.CONNECTION, async (socket: Socket) => {
       const socketService = SocketService.getInstance(this.io, socket);
       await socketService.handleConnection();
+
       socket.on(SocketOn.JOIN, () => {
         socketService.joinToRoom();
       });

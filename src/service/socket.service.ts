@@ -1,15 +1,15 @@
 import { Server, Socket } from "socket.io";
-import { redisService } from "./redis.service";
 import { SocketEmit } from "../enums/socket.enum";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { validateTokenFunction } from "../middlewares/validateToken.middleware";
+import { redisClass, redisService } from "./redis.service";
 import { JwtPayload } from "jsonwebtoken";
 import { AuthService } from "./auth.service";
 
 export class SocketService {
   private static instance: SocketService;
-  private authService: AuthService = new AuthService();
-  private redisService = redisService;
+  private authService: AuthService;
+  private redisService: redisClass;
 
   private constructor(
     private io: Server<
@@ -20,7 +20,8 @@ export class SocketService {
     >,
     private socket: Socket
   ) {
-    // Initialize the SocketService
+    this.authService = new AuthService();
+    this.redisService = redisService;
   }
 
   public async sendMessage(message: string) {
@@ -34,7 +35,6 @@ export class SocketService {
 
   public joinToRoom() {
     this.socket.join("room");
-
     this.socket.emit(SocketEmit.JOIN, "joined");
   }
 
