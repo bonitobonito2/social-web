@@ -41,6 +41,10 @@ export class SocketService {
 
       if (roomUser) {
         this.socket.emit(SocketEmit.SENT, data["key"]);
+        this.socket.emit(SocketEmit.MESSAGE, {
+          sent: data["key"],
+          email: user.email,
+        });
         this.socket
           .to("room4")
           .emit(SocketEmit.MESSAGE, { sent: data["key"], email: user.email });
@@ -65,7 +69,8 @@ export class SocketService {
       this.socket.join("room" + chatId);
       this.socket.emit(SocketEmit.JOIN, "room" + chatId);
     } catch (err) {
-      throw err;
+      this.socket.emit(SocketEmit.ERROR, err);
+      // throw err;
     }
   }
 
@@ -97,7 +102,6 @@ export class SocketService {
 
   public async handleConnection() {
     try {
-      await this.redisService.getAllUsers();
       const decoded: string | JwtPayload = this.validateToken();
 
       await this.redisService.removeSocketIdByUserId(decoded["id"]);
