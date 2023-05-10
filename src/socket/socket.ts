@@ -24,10 +24,10 @@ class SocketServer {
     });
     this.io.on(SocketOn.CONNECTION, async (socket: Socket) => {
       const socketService = SocketService.getInstance(this.io, socket);
-
       await socketService.handleConnection();
-      socket.on(SocketOn.JOIN, (data) => {
-        socketService.joinToRoom(data);
+
+      socket.on(SocketOn.JOIN, async (data) => {
+        await socketService.joinToRoom(data);
       });
 
       socket.on(SocketOn.MESSAGE, async (message) => {

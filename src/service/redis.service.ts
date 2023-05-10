@@ -38,8 +38,7 @@ export class redisClass extends redisInstance {
     const values = await Promise.all(
       keys.map(async (key) => await this.client.get(key))
     );
-    console.log(values);
-    console.log(keys);
+    return { keys: keys, values: values };
   }
 
   async getClientBySocketId(socketId: string) {
@@ -48,10 +47,8 @@ export class redisClass extends redisInstance {
       const values = await Promise.all(
         keys.map(async (key) => await this.client.get(key))
       );
-      console.log(keys, "keys/// \n", values, "values \n", socketId);
       const correctIndex = values.findIndex((value) => value == socketId);
-      console.log(correctIndex);
-      console.log(values[correctIndex], "resultttt");
+
       return keys[correctIndex];
     } catch (err) {
       throw err;
@@ -64,12 +61,8 @@ export class redisClass extends redisInstance {
         keys.map(async (key) => await this.client.get(key))
       );
       const correctIndex = values.findIndex((value) => value === socketId);
-      // console.log(keys, values);
-      console.log(correctIndex);
 
       if (correctIndex !== -1) await this.client.del(keys[correctIndex]);
-      await this.getAllUsers();
-      return "deleted";
     } catch (err) {
       throw err;
     }

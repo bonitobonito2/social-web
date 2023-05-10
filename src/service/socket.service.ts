@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { SocketEmit } from "../enums/socket.enum";
+import { SocketEmit, SocketOn } from "../enums/socket.enum";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { validateTokenFunction } from "../middlewares/validateToken.middleware";
 import { redisClass, redisService } from "./redis.service";
@@ -28,7 +28,10 @@ export class SocketService {
 
   public async sendMessage(message: string) {
     try {
-      const roomUsers = this.io.sockets.adapter.rooms.get("room4");
+      const roomUser = this.io.sockets.adapter.rooms
+        .get("room4")
+        ?.has(this.socket.id);
+
       const data = JSON.parse(message);
       const id = await this.redisService.getClientBySocketId(
         this.socket.id.toString()
@@ -36,16 +39,16 @@ export class SocketService {
 
       const user = await this.authService.getUserById(parseInt(id?.toString()));
 
-      if (roomUsers?.has(this.socket.id)) {
+      if (roomUser) {
         this.socket.emit(SocketEmit.SENT, data["key"]);
         this.socket
           .to("room4")
           .emit(SocketEmit.MESSAGE, { sent: data["key"], email: user.email });
-      } else this.socket.emit(SocketEmit.ERROR, "not room user");
+      } else {
+        this.socket.emit(SocketEmit.ERROR, "not room user");
+      }
     } catch (err) {
-      console.log(err);
       this.socket.emit(SocketEmit.JOIN, err);
-      // throw err;
     }
   }
 
@@ -76,7 +79,6 @@ export class SocketService {
       const validated = validateTokenFunction(
         typeof token == "string" ? token : token[0]
       );
-      console.log(validated, "validated");
       return validated;
     } catch (err) {
       throw err;
@@ -95,19 +97,17 @@ export class SocketService {
 
   public async handleConnection() {
     try {
-      console.log("here");
       await this.redisService.getAllUsers();
       const decoded: string | JwtPayload = this.validateToken();
-      // const userExsists = await this.redisService.getClientId(decoded["id"]);
 
       await this.redisService.removeSocketIdByUserId(decoded["id"]);
       await this.saveSocketClientInRedis(decoded["id"], this.socket.id);
 
-      this.socket.emit("connection", true);
+      this.socket.emit(SocketOn.CONNECTION, true);
     } catch (err) {
       console.log(err);
-      this.socket.emit(SocketEmit.ERROR, err);
 
+      this.socket.emit(SocketEmit.ERROR, err);
       this.socket.disconnect();
     }
   }

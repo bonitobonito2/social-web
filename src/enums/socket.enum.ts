@@ -11,4 +11,5 @@ export enum SocketEmit {
   SENT = "sent",
   ERROR = "error",
   NOTIFICATION = "notificaton",
+  CONNECTION = "connection",
 }
