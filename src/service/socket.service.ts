@@ -5,10 +5,12 @@ import { validateTokenFunction } from "../middlewares/validateToken.middleware";
 import { redisClass, redisService } from "./redis.service";
 import { JwtPayload } from "jsonwebtoken";
 import { AuthService } from "./auth.service";
+import { ChatService } from "./chat.service";
 
 export class SocketService {
   private static instance: SocketService;
   private authService: AuthService;
+  private chatService = new ChatService();
   private redisService: redisClass;
 
   private constructor(
@@ -25,17 +27,43 @@ export class SocketService {
   }
 
   public async sendMessage(message: string) {
-    const roomUsers = this.io.sockets.adapter.rooms.get("room");
-    const data = JSON.parse(message);
+    try {
+      const roomUsers = this.io.sockets.adapter.rooms.get("room4");
+      const data = JSON.parse(message);
+      const id = await this.redisService.getClientBySocketId(
+        this.socket.id.toString()
+      );
 
-    if (roomUsers?.has(this.socket.id))
-      this.socket.to("room").emit(SocketEmit.MESSAGE, { sent: data["key"] });
-    else this.socket.emit(SocketEmit.ERROR, "not room user");
+      const user = await this.authService.getUserById(parseInt(id?.toString()));
+
+      if (roomUsers?.has(this.socket.id)) {
+        this.socket.emit(SocketEmit.SENT, data["key"]);
+        this.socket
+          .to("room4")
+          .emit(SocketEmit.MESSAGE, { sent: data["key"], email: user.email });
+      } else this.socket.emit(SocketEmit.ERROR, "not room user");
+    } catch (err) {
+      console.log(err);
+      this.socket.emit(SocketEmit.JOIN, err);
+      // throw err;
+    }
   }
 
-  public joinToRoom() {
-    this.socket.join("room");
-    this.socket.emit(SocketEmit.JOIN, "joined");
+  public async joinToRoom(data) {
+    try {
+      const chatId = data["chatId"];
+      const userId = await this.redisService.getClientBySocketId(
+        this.socket.id
+      );
+      await this.chatService.checkIfUserIsInChat(
+        parseInt(userId.toString()),
+        chatId
+      );
+      this.socket.join("room" + chatId);
+      this.socket.emit(SocketEmit.JOIN, "room" + chatId);
+    } catch (err) {
+      throw err;
+    }
   }
 
   public async disconnect() {
@@ -48,6 +76,7 @@ export class SocketService {
       const validated = validateTokenFunction(
         typeof token == "string" ? token : token[0]
       );
+      console.log(validated, "validated");
       return validated;
     } catch (err) {
       throw err;
@@ -66,7 +95,12 @@ export class SocketService {
 
   public async handleConnection() {
     try {
+      console.log("here");
+      await this.redisService.getAllUsers();
       const decoded: string | JwtPayload = this.validateToken();
+      // const userExsists = await this.redisService.getClientId(decoded["id"]);
+
+      await this.redisService.removeSocketIdByUserId(decoded["id"]);
       await this.saveSocketClientInRedis(decoded["id"], this.socket.id);
 
       this.socket.emit("connection", true);

@@ -7,6 +7,14 @@ export class redisClass extends redisInstance {
     super();
   }
 
+  public async removeSocketIdByUserId(userId: string) {
+    try {
+      await this.client.del(userId);
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async setSocketClient(id: string, socketId: string): Promise<string> {
     try {
       const data = await this.client.set(id, socketId);
@@ -27,6 +35,10 @@ export class redisClass extends redisInstance {
 
   async getAllUsers() {
     const keys = await this.client.keys("*");
+    const values = await Promise.all(
+      keys.map(async (key) => await this.client.get(key))
+    );
+    console.log(values);
     console.log(keys);
   }
 
@@ -36,10 +48,11 @@ export class redisClass extends redisInstance {
       const values = await Promise.all(
         keys.map(async (key) => await this.client.get(key))
       );
-      const correctIndex = values.findIndex((value) => value === socketId);
-      console.log(keys, values);
-
-      if (correctIndex !== -1) return this.client.del(keys[correctIndex]);
+      console.log(keys, "keys/// \n", values, "values \n", socketId);
+      const correctIndex = values.findIndex((value) => value == socketId);
+      console.log(correctIndex);
+      console.log(values[correctIndex], "resultttt");
+      return keys[correctIndex];
     } catch (err) {
       throw err;
     }
@@ -51,9 +64,11 @@ export class redisClass extends redisInstance {
         keys.map(async (key) => await this.client.get(key))
       );
       const correctIndex = values.findIndex((value) => value === socketId);
-      console.log(keys, values);
-      if (correctIndex !== -1) await this.client.del(keys[correctIndex]);
+      // console.log(keys, values);
+      console.log(correctIndex);
 
+      if (correctIndex !== -1) await this.client.del(keys[correctIndex]);
+      await this.getAllUsers();
       return "deleted";
     } catch (err) {
       throw err;

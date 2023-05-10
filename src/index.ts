@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import http from "http";
 import { instrument } from "@socket.io/admin-ui";
 import authRouter from "./routes/auth.routes";
+import chatRoutes from "./routes/chat.routes";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { validateToken } from "./middlewares/validateToken.middleware";
@@ -42,6 +43,7 @@ app.use("/auth", authRouter);
 
 app.use(validateToken);
 
+app.use("/chat", chatRoutes);
 app.use("/request", requestRouter);
 
 app.use("*", (Request, Response) => {
