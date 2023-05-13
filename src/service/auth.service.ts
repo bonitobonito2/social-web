@@ -56,7 +56,7 @@ export class AuthService {
     try {
       const user = await this.getUser(email);
       user.verifed = true;
-      const verife = await this.userRepo.save(user);
+      await this.userRepo.save(user);
       return true;
     } catch (err) {
       throw err;

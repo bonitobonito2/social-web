@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 export const validateToken: RequestHandler = (req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
-  console.log(token, "token");
+  // console.log(token, "tokennnnnnn");
   if (!token) {
     throw new Error("u need token on protected routes");
   }

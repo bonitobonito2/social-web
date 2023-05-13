@@ -36,7 +36,7 @@ class SocketServer {
 
       socket.on(SocketOn.DISCONNECT, async () => {
         console.log("disconnecting");
-        await socketService.disconnect();
+        await socketService.disconnect("unknown");
       });
     });
   }

@@ -12,7 +12,6 @@ export function validateRegistration(
   res: Response,
   next: NextFunction
 ) {
-  console.log("aq shemovdivar?");
   const { error } = registration.validate(req.body);
 
   if (error) {

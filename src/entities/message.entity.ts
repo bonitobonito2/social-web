@@ -15,17 +15,16 @@ export class Messages {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ManyToOne(() => User, (user) => user.message)
+  @JoinColumn()
+  user: User;
   @ManyToOne(() => chat, (chat) => chat.message)
   @JoinColumn()
   chat: chat;
 
-  @ManyToOne(() => chat, (chat) => chat.message)
-  @JoinColumn()
-  user: User;
-
   @Column()
   content: string;
 
-  @Column("timestamp without time zone", { name: "createdAt", nullable: true })
+  @Column({ type: "timestamptz", precision: 3 })
   createdAt: Date | null;
 }

@@ -17,7 +17,6 @@ export const sendFriendRequest: RequestHandler = async (req, res, next) => {
 
     return res.json("request sent");
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };

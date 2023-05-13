@@ -1,18 +1,18 @@
-import express, { Application, NextFunction, Request, Response } from "express";
+import express, { Application, Request, Response } from "express";
 import { myDataSource } from "./database/db.config";
 import dotenv from "dotenv";
 import http from "http";
-import { instrument } from "@socket.io/admin-ui";
 import authRouter from "./routes/auth.routes";
 import chatRoutes from "./routes/chat.routes";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { validateToken } from "./middlewares/validateToken.middleware";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import requestRouter from "./routes/friendRequest.routes";
 const port = process.env.PORT ? process.env.PORT : 4500;
 import { getSocketInstance } from "./socket/socket";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import messagesRouter from "./routes/messages.routes";
 const app: Application = express();
 app.use(cors());
 
@@ -43,6 +43,7 @@ app.use("/auth", authRouter);
 
 app.use(validateToken);
 
+app.use("/messages", messagesRouter);
 app.use("/chat", chatRoutes);
 app.use("/request", requestRouter);
 

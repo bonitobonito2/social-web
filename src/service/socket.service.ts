@@ -6,12 +6,14 @@ import { redisClass, redisService } from "./redis.service";
 import { JwtPayload } from "jsonwebtoken";
 import { AuthService } from "./auth.service";
 import { ChatService } from "./chat.service";
+import { MessagesService } from "./messages.service";
 
 export class SocketService {
   private static instance: SocketService;
   private authService: AuthService;
   private chatService = new ChatService();
   private redisService: redisClass;
+  private messagesService = new MessagesService();
 
   private constructor(
     private io: Server<
@@ -40,18 +42,28 @@ export class SocketService {
       const user = await this.authService.getUserById(parseInt(id?.toString()));
 
       if (roomUser) {
+        const message = await this.messagesService.saveMessge(
+          data["key"],
+          4,
+          parseInt(id.toString())
+        );
+        console.log(message, "message");
         this.socket.emit(SocketEmit.SENT, data["key"]);
         this.socket.emit(SocketEmit.MESSAGE, {
           sent: data["key"],
           email: user.email,
+          createdAt: message.createdAt,
         });
-        this.socket
-          .to("room4")
-          .emit(SocketEmit.MESSAGE, { sent: data["key"], email: user.email });
+        this.socket.to("room4").emit(SocketEmit.MESSAGE, {
+          sent: data["key"],
+          email: user.email,
+          createdAt: message.createdAt,
+        });
       } else {
         this.socket.emit(SocketEmit.ERROR, "not room user");
       }
     } catch (err) {
+      console.log(err);
       this.socket.emit(SocketEmit.JOIN, err);
     }
   }
@@ -74,8 +86,9 @@ export class SocketService {
     }
   }
 
-  public async disconnect() {
+  public async disconnect(err = null) {
     await redisService.removeClientId(this.socket.id);
+    this.socket.emit(SocketEmit.ERROR, err);
   }
 
   private validateToken() {
@@ -110,9 +123,9 @@ export class SocketService {
       this.socket.emit(SocketOn.CONNECTION, true);
     } catch (err) {
       console.log(err);
-
       this.socket.emit(SocketEmit.ERROR, err);
       this.socket.disconnect();
+      // this.disconnect();
     }
   }
 

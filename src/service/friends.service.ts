@@ -19,7 +19,7 @@ export class FriendsService {
         friend: user1,
       });
 
-      return isUser2FriendOfUser1 && isUser1FriendOfUser2 ? true : false;
+      return Boolean(isUser2FriendOfUser1 && isUser1FriendOfUser2);
     } catch (err) {
       throw err;
     }

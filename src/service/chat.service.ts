@@ -1,6 +1,5 @@
 import { myDataSource } from "../database/db.config";
 import { chat } from "../entities/chat.entity";
-import { Friends } from "../entities/friends.entity";
 import { FriendsService } from "./friends.service";
 import { User } from "../entities/user.entity";
 import { AuthService } from "./auth.service";
@@ -16,6 +15,15 @@ export class ChatService {
     return arr1.some((elem1) => arr2.includes(elem1));
   }
 
+  public async getChatById(id: number) {
+    try {
+      const chat = this.chatRepo.findOneBy({ id: id });
+      if (!chat) throw "chat doesnot exsists";
+      return chat;
+    } catch (err) {
+      throw err;
+    }
+  }
   public async checkIfTwoPersonHaveAChat(user1: User, user2: User) {
     try {
       const user1Chats = await this.chatRepo.find({
@@ -24,7 +32,6 @@ export class ChatService {
         relations: { user: true },
       });
 
-      //   console.log(user1Chats);
       const user2Chats = await this.chatRepo.find({
         where: { user: user2 },
 
