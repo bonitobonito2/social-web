@@ -1,7 +1,7 @@
 import http from "http";
 import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { SocketOn } from "../enums/socket.enum";
+import { SocketEmit, SocketOn } from "../enums/socket.enum";
 import { SocketService } from "../service/socket.service";
 import { instrument } from "@socket.io/admin-ui";
 
@@ -13,7 +13,7 @@ class SocketServer {
   ) {
     this.io = new Server(server, {
       cors: {
-        origin: ["https://admin.socket.io", "http://localhost:3000"],
+        origin: ["http://localhost:3000", "http://192.168.1.104:3000"],
         methods: ["GET", "POST"],
         credentials: true,
       },
@@ -30,6 +30,18 @@ class SocketServer {
         await socketService.joinToRoom(data);
       });
 
+      socket.on(SocketOn.TYPING, (data) => {
+        console.log(data);
+        socket
+          .to("room4")
+          .emit(SocketEmit.TYPING, { typing: true, email: data["email"] });
+      });
+
+      socket.on("stopTyping", (data) => {
+        socket
+          .to("room4")
+          .emit("stopTyping", { typing: false, email: data["email"] });
+      });
       socket.on(SocketOn.MESSAGE, async (message) => {
         await socketService.sendMessage(message);
       });

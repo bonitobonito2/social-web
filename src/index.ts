@@ -38,6 +38,7 @@ myDataSource
 
 dotenv.config();
 
+console.log("shemovedi");
 app.use(bodyParser.json());
 app.use("/auth", authRouter);
 

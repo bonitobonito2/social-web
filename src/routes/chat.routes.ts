@@ -5,10 +5,12 @@ import {
   registration,
   verifeEmail,
 } from "../controller/auth/auth.controller";
-import { createChat } from "../controller/auth/chat.controller";
+import { createChat, getUsers } from "../controller/auth/chat.controller";
 
 const chatRoutes = express.Router();
 
 chatRoutes.post("/createChat", createChat);
+
+chatRoutes.get("/getUsers", getUsers);
 
 export default chatRoutes;

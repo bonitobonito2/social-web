@@ -25,6 +25,15 @@ export class MessagesService {
     }
   }
 
+  public async deleteAllMessages() {
+    try {
+      await this.messagesRepo.query("delete from message");
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
   public async getChatMessages(chatId: number) {
     try {
       const chat = await this.chatService.getChatById(chatId);

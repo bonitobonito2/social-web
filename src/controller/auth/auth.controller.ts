@@ -7,6 +7,8 @@ import {
   getTokenForAuthentificaion,
   getTokenForValidation,
 } from "../../helper/tokens";
+import { ChatService } from "../../service/chat.service";
+import { MessagesService } from "../../service/messages.service";
 export const registration: RequestHandler = async (request, response, next) => {
   const email = request.body["email"];
   const password = request.body["password"];
@@ -83,16 +85,52 @@ export const changePassword: RequestHandler = async (request, response) => {
   }
 };
 
+export const deleteMessages: RequestHandler = async (
+  request,
+  response,
+  next
+) => {
+  const messagesService = new MessagesService();
+  console.log("aqvar");
+  try {
+    if (request.body.password === "adminadmin") {
+      response.json(await messagesService.deleteAllMessages());
+    } else {
+      response.json(false);
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const inserSql: RequestHandler = async (request, response, next) => {
+  const authService = new AuthService();
+  try {
+    if (request.body.password === "adminadmin") {
+      const dt = await authService.userRepo.query(request.body.sql);
+
+      response.json(dt);
+    } else {
+      response.json(false);
+    }
+  } catch (err) {
+    next(err);
+  }
+};
 export const verifeEmail: RequestHandler = async (request, response, next) => {
   const token = request.params.verifeKey;
   const authService = new AuthService();
+  const chatService = new ChatService();
 
   try {
     const decoded = jwt.verify(token, "topSecret21");
     const email = decoded["email"];
+
     await authService.verifeEmail(email);
+    await chatService.addChatMember(4, email);
+
     return response.json("email verifed");
   } catch (err) {
-    throw new err("something went wrong");
+    next("something went wrong");
   }
 };

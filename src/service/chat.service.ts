@@ -56,6 +56,22 @@ export class ChatService {
       throw err;
     }
   };
+
+  private getChatWithUserRelationship = async (chatId: number) => {
+    return this.chatRepo.find({
+      where: { id: chatId },
+      relations: { user: true },
+    });
+  };
+
+  public addChatMember = async (chat_id: number, userEmail: string) => {
+    const chat = await this.getChatWithUserRelationship(chat_id);
+    const user = await this.userService.getUser(userEmail);
+
+    chat[0].user = [...chat[0].user, user];
+    const xd = await this.chatRepo.save(chat);
+    console.log(xd, "xdddddddddddd");
+  };
   public createChat = async (user1Id: number, user2Id: number) => {
     try {
       const user1 = await this.userService.getUserById(user1Id);

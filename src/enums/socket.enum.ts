@@ -3,6 +3,7 @@ export enum SocketOn {
   DISCONNECT = "disconnect",
   JOIN = "join",
   MESSAGE = "message",
+  TYPING = "typing",
 }
 
 export enum SocketEmit {
@@ -12,4 +13,5 @@ export enum SocketEmit {
   ERROR = "error",
   NOTIFICATION = "notificaton",
   CONNECTION = "connection",
+  TYPING = "typing",
 }

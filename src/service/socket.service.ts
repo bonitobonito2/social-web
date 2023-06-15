@@ -38,7 +38,6 @@ export class SocketService {
       const id = await this.redisService.getClientBySocketId(
         this.socket.id.toString()
       );
-
       const user = await this.authService.getUserById(parseInt(id?.toString()));
 
       if (roomUser) {
@@ -47,7 +46,6 @@ export class SocketService {
           4,
           parseInt(id.toString())
         );
-        console.log(message, "message");
         this.socket.emit(SocketEmit.SENT, data["key"]);
         this.socket.emit(SocketEmit.MESSAGE, {
           sent: data["key"],
@@ -63,7 +61,6 @@ export class SocketService {
         this.socket.emit(SocketEmit.ERROR, "not room user");
       }
     } catch (err) {
-      console.log(err);
       this.socket.emit(SocketEmit.JOIN, err);
     }
   }

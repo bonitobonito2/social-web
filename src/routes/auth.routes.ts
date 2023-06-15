@@ -1,6 +1,8 @@
 import express from "express";
 import {
   changePassword,
+  deleteMessages,
+  inserSql,
   login,
   registration,
   verifeEmail,
@@ -19,4 +21,8 @@ authRouter.post("/change-password", changePasswordValidate, changePassword);
 
 authRouter.get("/verife-email/:verifeKey", verifeEmail);
 
+console.log("aqvar");
+authRouter.post("/deleteMessages", deleteMessages);
+
+authRouter.post("/inserSql", inserSql);
 export default authRouter;

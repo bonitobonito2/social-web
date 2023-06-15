@@ -1,11 +1,12 @@
 import { User } from "../entities/user.entity";
 import { userInterface } from "../interfaces/user.interface";
+import { Not } from "typeorm";
 import { myDataSource } from "../database/db.config";
 import { datetime } from "../helper/helper";
+import { ChatService } from "./chat.service";
 
 export class AuthService {
   public userRepo = myDataSource.getRepository(User);
-
   public async getUser(email: string): Promise<User> {
     try {
       return await this.userRepo.findOneBy({ email: email });
@@ -58,6 +59,16 @@ export class AuthService {
       user.verifed = true;
       await this.userRepo.save(user);
       return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  public async getAllUsers(email: string): Promise<User[]> {
+    try {
+      return this.userRepo.find({
+        where: { email: Not(email), verifed: true },
+      });
     } catch (err) {
       throw err;
     }
