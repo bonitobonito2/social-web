@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: social
+      POSTGRES_PASSWORD: social
+      POSTGRES_DB: social
+    volumes:
+      - social_pg:/var/lib/postgresql
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+  auth:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: npm run dev
+    ports:
+      - 4500:4500
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+volumes:
+  redis_data:
+  social_pg:

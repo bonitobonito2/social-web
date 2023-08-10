@@ -13,7 +13,7 @@ class SocketServer {
   ) {
     this.io = new Server(server, {
       cors: {
-        origin: ["http://localhost:3000", "http://192.168.1.104:3000"],
+        origin: ["http://localhost:3000", "http://10.255.1.70:3000"],
         methods: ["GET", "POST"],
         credentials: true,
       },

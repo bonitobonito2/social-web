@@ -131,6 +131,7 @@ export const verifeEmail: RequestHandler = async (request, response, next) => {
 
     return response.json("email verifed");
   } catch (err) {
-    next("something went wrong");
+    console.log(err, "error");
+    next(err);
   }
 };

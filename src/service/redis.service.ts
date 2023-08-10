@@ -1,6 +1,6 @@
-import { redisInstance } from "./../redis/redis";
+import { RedisInstance } from "./../redis/redis";
 
-export class redisClass extends redisInstance {
+export class redisClass extends RedisInstance {
   private readonly client = this.start();
 
   constructor() {

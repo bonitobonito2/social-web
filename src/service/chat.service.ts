@@ -69,8 +69,7 @@ export class ChatService {
     const user = await this.userService.getUser(userEmail);
 
     chat[0].user = [...chat[0].user, user];
-    const xd = await this.chatRepo.save(chat);
-    console.log(xd, "xdddddddddddd");
+    await this.chatRepo.save(chat);
   };
   public createChat = async (user1Id: number, user2Id: number) => {
     try {

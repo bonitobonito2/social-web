@@ -12,11 +12,11 @@ dotenv.config();
 
 export const myDataSource = new DataSource({
   type: "postgres",
-  host: process.env.DATABASE_MASTER_HOST,
-  port: parseInt(process.env.DATABASE_PORT), // or the port number you are using
-  username: process.env.DATABASE_USER,
-  database: process.env.DATABASE_NAME,
-  password: process.env.DATABASE_PASSWORD,
+  host: "db", // Use the service name "db" defined in your Docker Compose
+  port: 5432, // Default PostgreSQL port
+  username: "social",
+  database: "social",
+  password: "social",
   entities: [UserDetails, User, Friends, friendRequests, chat, Messages],
   synchronize: true,
 });
